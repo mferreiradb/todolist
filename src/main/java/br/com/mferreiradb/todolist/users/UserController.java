@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     @PostMapping
     public void create(@RequestBody UserModel body) {
-        System.out.println("Body: " + body.name);
+        System.out.println("Body: " + body.getName());
+        System.out.println("Body: " + body.getUsername());
+        System.out.println("Body: " + body.getPassword());
     }
 }
