@@ -1,5 +1,6 @@
 package br.com.mferreiradb.todolist.users;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,10 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    
+    @Autowired
+    private IUserRepository userRepository;
     @PostMapping
-    public void create(@RequestBody UserModel body) {
-        System.out.println("Body: " + body.getName());
-        System.out.println("Body: " + body.getUsername());
-        System.out.println("Body: " + body.getPassword());
+    public UserModel create(@RequestBody UserModel body) {
+        var userCreted = this.userRepository.save(body);
+        return userCreted;
     }
 }
