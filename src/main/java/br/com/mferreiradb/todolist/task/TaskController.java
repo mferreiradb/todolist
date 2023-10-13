@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.mferreiradb.todolist.Utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -54,14 +55,11 @@ public class TaskController {
 
     @PutMapping("/{taskId}")
     public TaskModel udpate(HttpServletRequest request, @RequestBody TaskModel body, @PathVariable UUID taskId) {
-        var userId = request.getAttribute("userId");        
+        
         var task = this._taskRepository.findTaskById(taskId);
-        var createdAt = task.getCreatedAt();
 
-        body.setId(taskId);
-        body.setUserId((UUID) userId);
+        Utils.copyNonNullProperties(body, task);
 
-        body.setCreatedAt(createdAt);
-        return this._taskRepository.save(body);
+        return this._taskRepository.save(task);
     }
 }
