@@ -16,6 +16,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskModel> create(@RequestBody TaskModel body) {
+        System.out.println("Controller");
         var createdTask = this._taskRepository.save(body);
 
         return ResponseEntity.status(201).body(createdTask);
