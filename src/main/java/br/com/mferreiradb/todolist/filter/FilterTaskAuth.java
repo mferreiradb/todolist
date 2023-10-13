@@ -24,41 +24,48 @@ public class FilterTaskAuth extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-                // Pegar a autenticação (username e senha)
-                var authorization = request.getHeader("Authorization"); // Código em base 64
+        var servletPath = request.getServletPath();
 
-                // Calcula o tamanho da palavra indicada e a remove da string. Após isso, remove os espaços
-                var authToken = authorization.substring("Basic".length()).trim();
-                
-                // Decodifica o token e cria um array de bytes
-                byte[] authDecoded = Base64.getDecoder().decode(authToken);
+        if (servletPath.equals("/tasks")) {
+            // Pegar a autenticação (username e senha)
+            var authorization = request.getHeader("Authorization"); // Código em base 64
 
-                // Transforma em o token decodificado em uma string
-                var authString = new String(authDecoded);
+            // Calcula o tamanho da palavra indicada e a remove da string. Após isso, remove
+            // os espaços
+            var authToken = authorization.substring("Basic".length()).trim();
 
-                String[] credentials = authString.split(":");
+            // Decodifica o token e cria um array de bytes
+            byte[] authDecoded = Base64.getDecoder().decode(authToken);
 
-                String username = credentials[0];
-                String password = credentials[1];
-                
+            // Transforma em o token decodificado em uma string
+            var authString = new String(authDecoded);
 
-                // Validar usuário
-                var userExists = this._userRepository.findByUsername(username);
+            String[] credentials = authString.split(":");
 
-                if(userExists == null) {
-                    response.sendError(401);
+            String username = credentials[0];
+            String password = credentials[1];
+
+            // Validar usuário
+            var userExists = this._userRepository.findByUsername(username);
+
+            if (userExists == null) {
+                response.sendError(401);
+            } else {
+
+                // Validar senha
+                var verifiedPassword = BCrypt.verifyer().verify(password.toCharArray(), userExists.getPassword());
+                if (verifiedPassword.verified) {
+
+                    // Segue com a requisição
+                    filterChain.doFilter(request, response);
                 } else {
-                    
-                    // Validar senha
-                    var verifiedPassword = BCrypt.verifyer().verify(password.toCharArray(), userExists.getPassword());
-                    if(verifiedPassword.verified) {
-
-                        // Segue com a requisição            
-                        filterChain.doFilter(request, response);
-                    } else {
-                        response.sendError(401);
-                    }
+                    response.sendError(401);
                 }
+            }
+        } else {
+            filterChain.doFilter(request, response);
+        }
+
     }
 
 }
