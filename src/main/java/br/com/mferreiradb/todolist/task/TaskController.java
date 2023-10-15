@@ -33,10 +33,10 @@ public class TaskController {
         var currentDate = LocalDateTime.now();
 
         if(currentDate.isAfter(body.getStartedAt()) || currentDate.isAfter(body.getEndAt())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("As datas de inicio e fim devem ser maiores ou iguais à data atual.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The start and end dates must be greater than or equals to the current data.");
         }
         if(body.getStartedAt().isAfter(body.getEndAt())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio não pode ser superior à data de fim");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The start date cannot be greater than the end date.");
         }
         
 
@@ -58,7 +58,7 @@ public class TaskController {
         var task = this._taskRepository.findTaskById(taskId);
 
         if(task == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task does not exists");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task does not exists.");
         }
 
         var userId = request.getAttribute("userId");
