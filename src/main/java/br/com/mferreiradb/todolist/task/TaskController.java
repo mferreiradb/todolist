@@ -54,12 +54,21 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    public TaskModel udpate(HttpServletRequest request, @RequestBody TaskModel body, @PathVariable UUID taskId) {
-        
+    public ResponseEntity udpate(HttpServletRequest request, @RequestBody TaskModel body, @PathVariable UUID taskId) {        
         var task = this._taskRepository.findTaskById(taskId);
+
+        if(task == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task does not exists");
+        }
+
+        var userId = request.getAttribute("userId");
+
+        if (!task.getUserId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         Utils.copyNonNullProperties(body, task);
 
-        return this._taskRepository.save(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this._taskRepository.save(task));
     }
 }
